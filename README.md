@@ -118,6 +118,6 @@
 Clone the repo:
 
 ```bash
-git clone https://github.com/Smikey1/NoteMark
+git clone https://github.com/Housseinch17/NoteMark
 cd NoteMark
 ```
