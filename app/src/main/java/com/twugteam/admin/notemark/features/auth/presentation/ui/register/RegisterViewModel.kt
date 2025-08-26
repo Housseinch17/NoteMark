@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 class RegisterViewModel(
@@ -77,6 +78,10 @@ class RegisterViewModel(
 
     private fun updatePassword(password: String) {
         val isValid = userDataValidator.validatePassword(password)
+        val isConfirmPasswordValid = userDataValidator.isValidConfirmPassword(
+            password = password,
+            confirmPassword = _state.value.confirmPassword.value
+        )
         _state.update {
             it.copy(
                 password = it.password.copy(
@@ -84,12 +89,26 @@ class RegisterViewModel(
                     isValid = isValid,
                     isError = !isValid,
                 ),
+
             )
+        }
+
+        val isConfirmPasswordEmpty = _state.value.confirmPassword.value.isEmpty()
+        //if confirm password not empty update confirm password error
+        if(!isConfirmPasswordEmpty){
+            _state.update { newState->
+                newState.copy(
+                    confirmPassword = newState.confirmPassword.copy(
+                        isError = !isConfirmPasswordValid
+                    )
+                )
+            }
         }
         val canRegister = canRegister()
         _state.update { newState ->
             newState.copy(canRegister = canRegister)
         }
+        Timber.tag("MyTag").d("updatePassword: isValid: $isValid isConfirm: $isConfirmPasswordValid")
     }
 
     private fun updateConfirmPassword(confirmPassword: String) {
@@ -107,10 +126,12 @@ class RegisterViewModel(
             )
         }
 
+
         val canRegister = canRegister()
         _state.update { newState ->
             newState.copy(canRegister = canRegister)
         }
+        Timber.tag("MyTag").d("confirmPassword isValid: $isValid")
     }
 
     private fun register() {
