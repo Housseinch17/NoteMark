@@ -21,7 +21,7 @@ class UserDataValidator(
         val hasNumber = password.any { it.isDigit() }
         val hasSymbol = password.any { !it.isDigit() && !it.isLetter() }
 
-        return (hasMinimumLength && (hasNumber || hasSymbol))
+        return (hasMinimumLength && (hasNumber && hasSymbol))
     }
 
     data class ValidityState(
