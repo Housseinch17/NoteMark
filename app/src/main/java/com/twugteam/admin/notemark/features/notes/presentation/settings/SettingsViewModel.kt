@@ -5,7 +5,6 @@ import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.twugteam.admin.notemark.R
 import com.twugteam.admin.notemark.core.domain.SyncRepository
 import com.twugteam.admin.notemark.core.domain.network.ConnectivityObserver
@@ -16,6 +15,7 @@ import com.twugteam.admin.notemark.features.notes.constant.Constants.MANUAL_SYNC
 import com.twugteam.admin.notemark.features.notes.data.model.SyncInterval
 import com.twugteam.admin.notemark.features.notes.domain.NoteRepository
 import com.twugteam.admin.notemark.features.notes.domain.SyncIntervalDataStore
+import com.twugteam.admin.notemark.features.notes.domain.SyncStatusObserver
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,14 +35,15 @@ class SettingsViewModel(
     private val syncRepository: SyncRepository,
     private val syncIntervalDataStore: SyncIntervalDataStore,
     private val connectivityObserver: ConnectivityObserver,
-    private val workManager: WorkManager,
+    private val syncStatusObserver: SyncStatusObserver,
 ) : ViewModel() {
-    private val manualWorkName = MANUAL_SYNC_WORK_NAME
     private val _state: MutableStateFlow<SettingsUiState> = MutableStateFlow(SettingsUiState())
     val state = _state.asStateFlow()
 
     private val _events = Channel<SettingsEvents>()
     val events = _events.receiveAsFlow()
+
+    private val manualWorkName = MANUAL_SYNC_WORK_NAME
 
     init {
         //each one should run internally on an independent scope
@@ -87,9 +88,7 @@ class SettingsViewModel(
                 //start syncing
                 syncRepository.manualSync()
 
-                //access the workInfo state
-                val workInfo =
-                    workManager.getWorkInfosForUniqueWorkFlow(uniqueWorkName = manualWorkName)
+                val workInfo = syncStatusObserver.getWorkInfoFlow(workName = manualWorkName)
                 workInfo.collectLatest { workInfo ->
                     if (workInfo.firstOrNull() != null) {
                         Timber.tag("SyncingWorker").d("workInfo: ${workInfo.first().state}")

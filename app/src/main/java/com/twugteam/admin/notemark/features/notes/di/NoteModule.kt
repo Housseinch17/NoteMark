@@ -11,6 +11,7 @@ import com.twugteam.admin.notemark.core.database.notes.NoteEntity
 import com.twugteam.admin.notemark.core.domain.SyncRepository
 import com.twugteam.admin.notemark.features.notes.data.dataSource.OfflineFirstDataSource
 import com.twugteam.admin.notemark.features.notes.data.dataSource.SyncIntervalDataStoreImpl
+import com.twugteam.admin.notemark.features.notes.data.dataSource.WorkManagerSyncStatusObserver
 import com.twugteam.admin.notemark.features.notes.data.dataSource.localNoteDataSource.LocalNoteDataSource
 import com.twugteam.admin.notemark.features.notes.data.dataSource.localNoteDataSource.RoomLocalNoteDataSource
 import com.twugteam.admin.notemark.features.notes.data.dataSource.localSyncDataSource.LocalSyncDataSource
@@ -22,6 +23,7 @@ import com.twugteam.admin.notemark.features.notes.data.dataSource.remoteDataSour
 import com.twugteam.admin.notemark.features.notes.data.paging.NoteRemoteMediator
 import com.twugteam.admin.notemark.features.notes.domain.NoteRepository
 import com.twugteam.admin.notemark.features.notes.domain.SyncIntervalDataStore
+import com.twugteam.admin.notemark.features.notes.domain.SyncStatusObserver
 import com.twugteam.admin.notemark.features.notes.presentation.noteDetail.NoteDetailViewModel
 import com.twugteam.admin.notemark.features.notes.presentation.noteList.NoteListViewModel
 import com.twugteam.admin.notemark.features.notes.presentation.settings.SettingsViewModel
@@ -44,6 +46,7 @@ val noteModule = module {
     singleOf(::RoomLocalSyncDataSource).bind<LocalSyncDataSource>()
     singleOf(::SyncDataSourceImpl).bind<SyncDataSource>()
     singleOf(::SyncRepositoryImpl).bind<SyncRepository>()
+    singleOf(::WorkManagerSyncStatusObserver).bind<SyncStatusObserver>()
 
     single<SyncIntervalDataStoreDataSource> {
         SyncIntervalDataStoreDataSourceImpl(
