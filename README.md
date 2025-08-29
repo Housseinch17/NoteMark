@@ -25,7 +25,7 @@
 - **Room Database** – Local persistence.
 - **Paging 3 + RemoteMediator** – Offline-first pagination.
 - **WorkManager** – Background sync jobs.
-- **Hilt (DI)** – Dependency injection.
+- **Koin (DI)** – Dependency injection.
 - **Coroutines + Flow** – Async programming and reactive streams.
 - **DataStore(with custom encryption)** – Secure storage of authentication/session data using AES with Android Keystore..
 
